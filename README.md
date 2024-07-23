@@ -1,5 +1,5 @@
 # prefetchparser
-A simple script to parse Prefetch artifacts and save the output to CSV file. This is part of my automation script during Incident Response or Digital Forensics examinations, sometimes we need to check this artifact where Prefetch files can reveal the execution of unknown or suspicious executables, which may indicate malware or unauthorized software.. These Prefetch files provide a record of which programs have been executed on a system. This helps forensic analysts determine the usage of specific applications.
+A simple script to parse Prefetch artifacts and save the output to CSV file. This is part of my automation script during Incident Response or Digital Forensics examinations, sometimes we need to check this artifact where Prefetch files can reveal the execution of unknown or suspicious executables, which may indicate malware or unauthorized software. These Prefetch files provide a record of which programs have been executed on a system. This helps forensic analysts determine the usage of specific applications.
 
 ## How to Use
 Instructions to Use the Script:
