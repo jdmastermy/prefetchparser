@@ -16,7 +16,7 @@ Replace <input_folder> with the path to your folder containing Prefetch files an
 # Help Output
 To see the help message and usage instructions, you can run:
 
-`python wer_parser.py --help`
+`python prefetchparser.py --help`
 
 # Prefetch Paths
 Here are the paths that we should take a look at to find these artifacts.
