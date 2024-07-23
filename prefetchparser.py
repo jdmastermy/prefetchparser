@@ -4,6 +4,17 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 def parse_prefetch(filename):
+    """
+    Parse a Windows Prefetch file and extract relevant information.
+    
+    Parameters:
+    filename (str): Path to the Prefetch file.
+    
+    Returns:
+    dict: Extracted information including executable name, run count, 
+          last run time, volume creation time, file reference, volume 
+          serial number, and accessed files.
+    """
     with open(filename, 'rb') as f:
         header = f.read(84)
         if len(header) < 84:
@@ -48,10 +59,28 @@ def parse_prefetch(filename):
         return file_info
 
 def convert_windows_timestamp(timestamp):
+    """
+    Convert Windows FILETIME timestamp to a human-readable format.
+    
+    Parameters:
+    timestamp (int): Windows FILETIME timestamp.
+    
+    Returns:
+    str: Human-readable timestamp in 'YYYY-MM-DD HH:MM:SS' format.
+    """
     dt = datetime(1601, 1, 1) + timedelta(microseconds=timestamp // 10)
     return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 def parse_accessed_files(data):
+    """
+    Parse the accessed files list from Prefetch data.
+    
+    Parameters:
+    data (bytes): Raw data containing accessed file names.
+    
+    Returns:
+    list: List of accessed file names.
+    """
     files = []
     while data:
         file_length, = struct.unpack('<I', data[:4])
@@ -61,12 +90,24 @@ def parse_accessed_files(data):
     return files
 
 def process_prefetch_files(input_folder, output_folder):
-    prefetch_files = [f for f in os.listdir(input_folder) if f.endswith('.pf')]
+    """
+    Process all Prefetch files in the input folder and its subfolders, 
+    and save extracted information to a CSV file in the output folder.
+    
+    Parameters:
+    input_folder (str): Path to the root folder to start searching for Prefetch files.
+    output_folder (str): Path to the folder to save the CSV file.
+    """
+    prefetch_files = []
+    for root, _, files in os.walk(input_folder):
+        for file in files:
+            if file.endswith('.pf'):
+                prefetch_files.append(os.path.join(root, file))
+    
     prefetch_data = []
 
     for prefetch_file in prefetch_files:
-        file_path = os.path.join(input_folder, prefetch_file)
-        file_info = parse_prefetch(file_path)
+        file_info = parse_prefetch(prefetch_file)
         if file_info:
             prefetch_data.append(file_info)
 
@@ -78,9 +119,25 @@ def process_prefetch_files(input_folder, output_folder):
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description='Parse Windows Prefetch artifacts and output to CSV.')
-    parser.add_argument('input_folder', type=str, help='The input folder containing prefetch files.')
-    parser.add_argument('output_folder', type=str, help='The output folder to save the CSV file.')
+    # Create the argument parser
+    parser = argparse.ArgumentParser(
+        description='Parse Windows Prefetch artifacts and output the results to a CSV file.'
+    )
+    
+    # Add arguments
+    parser.add_argument(
+        'input_folder', 
+        type=str, 
+        help='The root folder to start searching for Prefetch files.'
+    )
+    parser.add_argument(
+        'output_folder', 
+        type=str, 
+        help='The output folder to save the CSV file.'
+    )
+    
+    # Parse the arguments
     args = parser.parse_args()
 
+    # Process the Prefetch files
     process_prefetch_files(args.input_folder, args.output_folder)
